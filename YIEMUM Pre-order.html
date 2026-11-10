@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>YIEMUM Pre-order</title>
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fbf6ec;--card:#fff;--ink:#2b2118;--mute:#8a7b6a;--acc:#c8501e;--accink:#fff;--line:#eadfcf;--tile:#f3e6cf;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1d1812;--card:#2a231b;--ink:#f5ecdf;--mute:#a89884;--acc:#e8703a;--accink:#1d1812;--line:#3d3328;--tile:#3a2f22}}
+:root[data-theme="dark"]{--bg:#1d1812;--card:#2a231b;--ink:#f5ecdf;--mute:#a89884;--acc:#e8703a;--accink:#1d1812;--line:#3d3328;--tile:#3a2f22}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Prompt',system-ui,sans-serif;font-size:16px}
+.view{display:none;max-width:480px;margin:0 auto;padding:20px 16px 110px}
+.view.on{display:block;animation:in .4s}
+@keyframes in{from{opacity:0}to{opacity:1}}
+#splash{display:none;min-height:100vh;align-items:center;justify-content:center;text-align:center;transition:opacity .8s}
+#splash.on{display:flex}#splash.out{opacity:0}
+#splash h1{font-size:30px;margin:0}#splash p{color:var(--mute)}
+h2{margin:4px 0 4px;font-size:22px}.sub{color:var(--mute);margin:0 0 16px;font-size:14px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.menu{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;padding:0;text-align:left;font:inherit;color:inherit;cursor:pointer}
+.menu .pic{aspect-ratio:1/1;background:var(--tile);display:flex;align-items:center;justify-content:center;font-size:56px}
+.menu .t{padding:10px 12px}.menu b{display:block;font-weight:500;font-size:14px}.menu span{color:var(--acc);font-weight:600}
+.bar{position:fixed;left:0;right:0;bottom:0;padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));background:var(--bg);border-top:1px solid var(--line);display:none}
+.bar.on{display:block}
+.btn{width:100%;max-width:448px;display:block;margin:0 auto;border:0;border-radius:14px;padding:14px;background:var(--acc);color:var(--accink);font:inherit;font-weight:600;font-size:16px;cursor:pointer}
+.sheet{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:flex-end;z-index:5}
+.sheet.on{display:flex}
+.panel{background:var(--bg);width:100%;max-width:480px;margin:0 auto;border-radius:20px 20px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom,0px));max-height:90vh;overflow:auto}
+.panel h3{margin:0 0 12px}
+.lbl{font-weight:500;margin:14px 0 6px;font-size:14px}
+.opt{display:flex;justify-content:space-between;border:1.5px solid var(--line);background:var(--card);border-radius:12px;padding:11px 14px;margin-bottom:8px;cursor:pointer}
+.opt.sel{border-color:var(--acc)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1.5px solid var(--line);background:var(--card);border-radius:999px;padding:7px 14px;font-size:14px;cursor:pointer}
+.chip.sel{border-color:var(--acc);background:var(--acc);color:var(--accink)}
+input,textarea{width:100%;font:inherit;color:var(--ink);background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:10px 12px}
+.qty{display:flex;align-items:center;gap:16px;margin-top:14px}
+.qty button{width:38px;height:38px;border-radius:50%;border:1.5px solid var(--line);background:var(--card);color:var(--ink);font-size:20px;cursor:pointer}
+.sum{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin:14px 0}
+.row{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px dashed var(--line)}
+.row small{display:block;color:var(--mute)}
+.tot{display:flex;justify-content:space-between;font-size:20px;font-weight:600;padding-top:12px}
+.tot span:last-child{color:var(--acc)}
+.cap{background:var(--tile);border-radius:14px;padding:12px 14px;font-size:14px;margin-top:14px}
+.x{background:none;border:0;color:var(--mute);cursor:pointer;font-size:18px}
+.link{background:none;border:0;color:var(--acc);font:inherit;cursor:pointer;padding:0;margin-bottom:8px}
+</style>
+</head>
+<body>
+<div id="splash" class="view"><div><h1>สวัสดีครับ<br>ร้าน YIEMUM</h1><p>อาหารเช้าสไตล์คาเฟ่ ส่งถึงหอ</p></div></div>
+
+<div id="menuV" class="view">
+  <h2>เลือกเมนูได้เลยครับ</h2>
+  <p class="sub">ทำสดส่งเช้าวันจันทร์ · แตะรูปเพื่อเลือก</p>
+  <div id="again"></div><div class="grid" id="grid"></div>
+</div>
+
+<div id="sumV" class="view">
+  <button class="link" id="back">← เพิ่มเมนู</button>
+  <h2>สรุปออเดอร์</h2>
+  <p class="sub" id="meta"></p>
+  <div class="lbl">ชื่อ</div><input id="fn" placeholder="ชื่อเล่น">
+  <div class="lbl">เบอร์ / ไลน์</div><input id="fc" placeholder="เบอร์โทรหรือไลน์ไอดี">
+  <div class="lbl">สถานที่ส่ง (หอ / ห้อง)</div><input id="fl" placeholder="เช่น นัมเบอร์วัน ห้อง 305">
+  <div class="sum"><div id="lines"></div><div class="tot"><span>ยอดรวม</span><span id="total"></span></div></div>
+  <p id="chk" style="margin:0;font-weight:500"></p>
+  <div class="cap"><b>ขอบคุณที่สั่งนะครับ 🙏</b><br>กรุณา <b>แคปหน้าจอนี้</b> ส่งมาให้ร้านทางแชท แล้วผมจะส่ง QR Code พร้อมยอดเงินให้สแกนโอนครับ<br>ออเดอร์จะยืนยันเมื่อโอนแล้ว · ส่งเช้าวันจันทร์</div>
+</div>
+
+<div class="bar" id="bar"><button class="btn" id="go"></button></div>
+
+<div class="sheet" id="sheet"><div class="panel" id="panel"></div></div>
+
+<script>
+// แก้เมนู/ราคาตรงนี้ได้เลย
+const MENU=[
+ {id:1,name:'แซนด์วิชซาวโดว์แฮมชีส',price:135,emoji:'🥪',bread:true},
+ {id:2,name:'เมนูที่ 2 (ตัวอย่าง)',price:99,emoji:'🌯',bread:false},
+ {id:3,name:'เมนูที่ 3 (ตัวอย่าง)',price:89,emoji:'🧀',bread:true},
+ {id:4,name:'เมนูที่ 4 (ตัวอย่าง)',price:79,emoji:'🍳',bread:false}
+];
+const BREADS=[{n:'ซาวโดว์เนื้อขาว',p:0},{n:'ซาวโดว์โฮลวีท',p:10}];
+const ALLERGY=['ไม่แพ้อะไร','ไข่','นม/ชีส','ถั่ว','อาหารทะเล','ผักบางชนิด'];
+const $=id=>document.getElementById(id);
+const baht=n=>'฿'+n.toLocaleString('th-TH');
+let cart=[],cur=null,code='Y'+Math.floor(1000+Math.random()*9000);
+const K='yiemum_last';
+function lsGet(){try{return JSON.parse(localStorage.getItem(K)||'null')}catch(e){return null}}
+function lsSave(){try{localStorage.setItem(K,JSON.stringify({cart,fn:$('fn').value,fc:$('fc').value,fl:$('fl').value}))}catch(e){}}
+function again(){const l=lsGet(),el=$('again');
+ if(!l||!l.cart||!l.cart.length||cart.length){el.innerHTML='';return}
+ const n=l.cart.reduce((a,c)=>a+c.qty,0);
+ el.innerHTML='<button class="chip" id="rep" style="margin-bottom:14px">🔁 สั่งซ้ำออเดอร์ครั้งก่อน ('+n+' ชิ้น)</button>';
+ $('rep').onclick=()=>{cart=l.cart.map(c=>({...c}));again();bar()}}
+
+function show(id){['splash','menuV','sumV'].forEach(v=>$(v).classList.toggle('on',v===id));window.scrollTo(0,0);bar();again()}
+function bar(){
+  const sum=cart.reduce((a,c)=>a+c.price*c.qty,0),n=cart.reduce((a,c)=>a+c.qty,0);
+  const b=$('bar'),on=$('menuV').classList.contains('on')&&n>0;
+  b.classList.toggle('on',on);$('go').textContent='ดูสรุปและราคา ('+n+' ชิ้น) · '+baht(sum);
+}
+$('grid').innerHTML=MENU.map(m=>`<button class="menu" data-id="${m.id}"><div class="pic">${m.emoji}</div><div class="t"><b>${m.name}</b><span>${baht(m.price)}</span></div></button>`).join('');
+$('grid').onclick=e=>{const b=e.target.closest('.menu');if(b)open(+b.dataset.id)};
+
+function open(id){
+  const m=MENU.find(x=>x.id===id);
+  cur={m,bread:0,al:[0],note:'',qty:1};
+  render();$('sheet').classList.add('on');
+}
+function price(){return (cur.m.price+(cur.m.bread?BREADS[cur.bread].p:0))*cur.qty}
+function render(){
+  const m=cur.m;
+  $('panel').innerHTML=`<h3>${m.emoji} ${m.name} · ${baht(m.price)}</h3>
+  ${m.bread?`<div class="lbl">เลือกขนมปัง</div>`+BREADS.map((b,i)=>`<div class="opt ${cur.bread===i?'sel':''}" data-b="${i}"><span>${b.n}</span><span>${b.p?'+'+baht(b.p):'ราคาปกติ'}</span></div>`).join(''):''}
+  <div class="lbl">แพ้อะไรไหม</div><div class="chips">${ALLERGY.map((a,i)=>`<span class="chip ${cur.al.includes(i)?'sel':''}" data-a="${i}">${a}</span>`).join('')}</div>
+  <div class="lbl">หมายเหตุ</div><textarea id="note" rows="2" placeholder="เช่น ไม่ใส่ผัก">${cur.note}</textarea>
+  <div class="qty"><button data-q="-1">−</button><b>${cur.qty}</b><button data-q="1">+</button><span style="margin-left:auto;font-weight:600;color:var(--acc)">${baht(price())}</span></div>
+  <button class="btn" id="add" style="margin-top:16px">เพิ่มลงตะกร้า · ${baht(price())}</button>
+  <button class="link" id="cx" style="margin:12px auto 0;display:block">ยกเลิก</button>`;
+}
+$('panel').onclick=e=>{
+  const t=e.target;
+  if(t.closest('[data-b]'))cur.bread=+t.closest('[data-b]').dataset.b;
+  else if(t.dataset.a!==undefined){
+    cur.note=$('note').value;const a=+t.dataset.a;
+    if(a===0)cur.al=[0];else{cur.al=cur.al.filter(x=>x!==0);cur.al=cur.al.includes(a)?cur.al.filter(x=>x!==a):[...cur.al,a];if(!cur.al.length)cur.al=[0]}
+  }
+  else if(t.dataset.q){cur.note=$('note').value;cur.qty=Math.max(1,cur.qty+ +t.dataset.q)}
+  else if(t.id==='cx'){$('sheet').classList.remove('on');return}
+  else if(t.id==='add'){
+    const b=cur.m.bread?BREADS[cur.bread]:null;
+    cart.push({name:cur.m.name,bread:b?b.n:'',price:cur.m.price+(b?b.p:0),al:cur.al.map(i=>ALLERGY[i]).join(', '),note:$('note').value.trim(),qty:cur.qty});
+    $('sheet').classList.remove('on');bar();return
+  }else return;
+  if(t.id!=='add'&&!t.closest('[data-b]'))render();else{cur.note=$('note').value;render()}
+};
+$('go').onclick=()=>{const l=lsGet()||{};if(!$('fn').value)$('fn').value=l.fn||'';if(!$('fc').value)$('fc').value=l.fc||'';if(!$('fl').value)$('fl').value=l.fl||'';drawSum();show('sumV')};
+['fn','fc','fl'].forEach(i=>$(i).oninput=lsSave);
+$('back').onclick=()=>show('menuV');
+
+function drawSum(){
+  const d=new Date(),total=cart.reduce((a,c)=>a+c.price*c.qty,0);
+  $('meta').textContent='รหัสออเดอร์ '+code+' · สั่งเมื่อ '+d.toLocaleString('th-TH',{dateStyle:'medium',timeStyle:'short'});
+  $('lines').innerHTML=cart.length?cart.map((c,i)=>`<div class="row"><div><b>${c.name}</b> ×${c.qty}<small>${c.bread?'ขนมปัง: '+c.bread+'<br>':''}แพ้: ${c.al}${c.note?'<br>หมายเหตุ: '+c.note:''}</small></div><div style="text-align:right">${baht(c.price*c.qty)}<br><button class="x" data-r="${i}">✕</button></div></div>`).join(''):'<p class="sub">ยังไม่มีรายการ</p>';
+  $('total').textContent=baht(total);lsSave();
+}
+$('lines').onclick=e=>{const r=e.target.dataset.r;if(r!==undefined){cart.splice(+r,1);drawSum();if(!cart.length)show('menuV')}};
+
+setTimeout(()=>{$('splash').classList.add('out');setTimeout(()=>show('menuV'),800)},1800);
+$('splash').onclick=()=>show('menuV');
+show('splash');
+</script>
+</body>
+</html>
